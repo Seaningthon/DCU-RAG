@@ -6,13 +6,13 @@ import streamlit as st
 
 model = OllamaLLM(model="llama3.2")
 
-SYSTEM_PROMPT = """You are a helpful teaching assistant for a specific university course. You answer student questions using ONLY the provided context from course materials (PDFs, lecture notes). 
+SYSTEM_PROMPT = """You are a helpful teaching assistant for a specific university course. You answer student questions using ONLY the provided context from course materials (PDFs, lecture notes) or from previous messages in this conversation. 
 
  
 
 Rules you must follow:
 
-- If the answer IS in the context, explain it clearly and reference the source.
+- If the answer IS in the context, explain it clearly and reference the source include the page number and name of the document.
 
 - If the answer IS NOT in the context, say exactly: "I cannot find the answer in the provided course materials."
 
@@ -24,7 +24,10 @@ Rules you must follow:
 
 
 #init db
-client = chromadb.PersistentClient(path="./pdf_db")
+@st.cache_resource
+def get_client():
+  return chromadb.PersistentClient(path="./pdf_db")
+client = get_client()
 
 #create a subject class
 class Subject(object):
@@ -32,62 +35,72 @@ class Subject(object):
     self.name = name
     self.collection = client.get_or_create_collection(name = name)
 
-  def upload(self,pdfs):
-    for pdf in pdfs:
-      reader = PdfReader(pdf)
-      print("gelezen")
-      #extract the text from pdf fully
-      full_text = ""
-      for page in range(len(reader.pages)):
-        text = reader.pages[page].extract_text()
-        full_text += text
-
-      #chunk the text
-      chunk_size = 1000
-      chunks = [full_text[i:i+chunk_size] for i in range(0, len(full_text), chunk_size)]
-
-      #add the chuncks to the db
-      self.collection.add(
-        documents=chunks,
-        metadatas=[{"source": pdf.name} for _ in chunks],
-        ids=[f"{pdf.name}_{i}" for i in range(len(chunks))]
-      )
-      print(f"Finished processing {pdf.name} for {self.name}")
-
   def __repr__(self):
     return self.name
+
+#user qeustiuons
+def user_query(u_query, subject:Subject, history = ""):
+  query = "yes"
+  if history:
+     query = model.invoke(f"Is anothe query from the DB needed to awnser {u_query}. This is the current chat history {history}.  ONLY REPLY WITH YES OR NO").strip().lower()
+  if "yes" in query:
+  #query the db
+    db_results = subject.collection.query(
+      query_texts=[model.invoke(input=f"You are a helpful teaching assistant for a specific university course. The student has given you the following question, '{u_query}' about uploaded pdfs. Based on the question give a concise prompt for a ChromaDB query to retrive the information you need from the pdf.")],
+      n_results=3
+    )
+    db_results= "\n\n".join(db_results["documents"][0])
+  #awnser based on query returned from DB nad history
+  if history and ("yes" in query):
+    return(model.invoke(input=f"{SYSTEM_PROMPT} Here is the context from the pdfs: {db_results}. Here is the previous conversation:{history}. Based on this context, answer the student's question: {u_query}"))
+
+  if history:
+    return(model.invoke(input=f"{SYSTEM_PROMPT}Here is the previous conversation:{history}. Based on this context, answer the student's question: {u_query}"))
   
-
-#create collectionfor each of 2 subjects
-sub1 = Subject("sub1")
-sub2 = Subject("sub2")
-
-
-
-def user_query(u_query, subject:Subject):
-  db_results = subject.collection.query(
-    query_texts=[model.invoke(input=f"You are a helpful teaching assistant for a specific university course. The student has given you the following question, '{u_query}' about uploaded pdfs. Based on the question give a concise prompt for a ChromaDB query to retrive the information you need from the pdf.")],
-    n_results=3
-  )
   return(model.invoke(input=f"{SYSTEM_PROMPT} Here is the context from the pdfs: {db_results}. Based on this context, answer the student's question: {u_query}"))
 
 st.title("DCU RAG")
-subject_list= {
-  "sub1":sub1,
-  "sub2":sub2 
-}
-subject_selector = st.selectbox("Select Subject", options=list(subject_list.keys()), key="subject")
-if subject_selector:
-  subject = subject_list[subject_selector]
 
-st.write("Upload your PDFs and then load the DB")
+#get the list of subjects to select from
+subject_list = {c.name: Subject(c.name) for c in client.list_collections()}
 
-pdfs =st.file_uploader("Upload PDFs", type=["pdf"], accept_multiple_files=True)
-if st.button("Upload to DB") and pdfs:
-  subject.upload(pdfs)
+#selection box for subject
+subject_selector = st.sidebar.selectbox("Select Subject", options=list(subject_list.keys()), key="subject")
+subject = subject_list[subject_selector]
+print(subject)
 
-question = st.text_input("What do you want to ask about the pdfs? \n")
-if question:
-  st.write("Generating answer...")
-  st.write(user_query(question, subject))
+st.write(f"Select a subject from the sidebar currently: {subject} and ask away\n")
+
+#create the chatgpt like look
+if "messages" not in st.session_state:
+    st.session_state.messages = []
+
+for message in st.session_state.messages:
+    with st.chat_message(message["role"]):
+        st.markdown(message["content"])
+
+if prompt := st.chat_input("What is up?"):
+    st.session_state.messages.append({"role": "user", "content": prompt})
+    with st.chat_message("user"):
+        st.markdown(prompt)
+
+    with st.chat_message("assistant"):
+      #check if theres history
+      if len(st.session_state.messages) <= 1:
+        response = user_query(prompt, subject)
+      
+      else:
+        history = "\n".join(
+            f"{m['role']}: {m['content']}"
+            for m in st.session_state.messages[:-1]
+        )
+  
+        response = user_query(
+            prompt,
+            subject,
+            history=history
+        )
+      st.markdown(response)
+  
+    st.session_state.messages.append({"role": "assistant", "content": response})
 
