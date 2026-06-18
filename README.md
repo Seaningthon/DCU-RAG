@@ -1,3 +1,5 @@
+Download Ollama(llama 3.2) and have it running while running the web server.
+
 To install the needed Python libraries simply run:
 ```pip install -r requirements.txt```
 

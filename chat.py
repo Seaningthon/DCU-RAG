@@ -3,6 +3,17 @@ import os
 import chromadb
 from langchain_ollama import OllamaLLM
 import streamlit as st
+import logging
+#logging
+logging.basicConfig(filename='logs/debug.log',level=logging.DEBUG)
+logging.basicConfig(filename='logs/info.log',level=logging.INFO)
+logging.basicConfig(filename='logs/warning.log',level=logging.WARNING)
+#make sure sever is running
+import requests
+try:
+  response = requests.get("http://localhost:11434", timeout=2)
+except requests.ConnectionError:
+  st.title("The Ollama server is not currently running. Make sure to run it.")
 
 model = OllamaLLM(model="llama3.2")
 
@@ -35,6 +46,19 @@ class Subject(object):
     self.name = name
     self.collection = client.get_or_create_collection(name = name)
 
+  def get_resources(self):
+    try:
+      results = self.collection.get()
+    except Exception:
+      return []
+    resources = {}
+    for md in results.get("metadatas", []):
+      source = md.get("source")
+      link = md.get("link")
+      if source and link:
+        resources[source] = link
+    return [{"source": s, "link": l} for s, l in resources.items()]  
+
   def __repr__(self):
     return self.name
 
@@ -66,8 +90,22 @@ subject_list = {c.name: Subject(c.name) for c in client.list_collections()}
 
 #selection box for subject
 subject_selector = st.sidebar.selectbox("Select Subject", options=list(subject_list.keys()), key="subject")
-subject = subject_list[subject_selector]
-print(subject)
+if subject_list:
+  subject = subject_list[subject_selector]
+
+  # Show available resources for the selected subject in the sidebar
+  st.sidebar.markdown("**These are the available resources**")
+  resources = subject.get_resources()
+  if resources:
+    for r in resources:
+      try:
+        st.sidebar.markdown(f"- [{r['source']}]({r['link']})")
+      except Exception:
+        st.sidebar.markdown(f"- {r['source']} (no link)")
+  else:
+    st.sidebar.markdown("No resources uploaded yet.")
+
+
 
 st.write(f"Select a subject from the sidebar currently: {subject} and ask away\n")
 
