@@ -1,0 +1,26 @@
+DEBUG:urllib3.connectionpool:Starting new HTTP connection (1): localhost:11434
+DEBUG:chromadb.config:Starting component System
+DEBUG:chromadb.config:Starting component Posthog
+DEBUG:urllib3.connectionpool:Starting new HTTP connection (1): localhost:11434
+DEBUG:git.cmd:Popen(['git', 'version'], cwd=C:\Users\spodw\Documents\dcu-rag, stdin=None, shell=False, universal_newlines=False)
+DEBUG:git.cmd:Popen(['git', 'version'], cwd=C:\Users\spodw\Documents\dcu-rag, stdin=None, shell=False, universal_newlines=False)
+DEBUG:git.util:sys.platform='win32', git_executable='git'
+DEBUG:git.cmd:Popen(['git', 'version'], cwd=C:\Users\spodw\Documents\dcu-rag, stdin=None, shell=False, universal_newlines=False)
+DEBUG:git.cmd:Popen(['git', 'rev-parse', '--show-toplevel'], cwd=C:\Users\spodw\Documents\dcu-rag, stdin=None, shell=False, universal_newlines=False)
+DEBUG:git.cmd:Popen(['git', 'remote', 'get-url', '--all', 'origin'], cwd=C:\Users\spodw\Documents\dcu-rag, stdin=None, shell=False, universal_newlines=False)
+DEBUG:git.util:sys.platform='win32', git_executable='git'
+DEBUG:git.cmd:Popen(['git', 'version'], cwd=C:\Users\spodw\Documents\dcu-rag, stdin=None, shell=False, universal_newlines=False)
+DEBUG:git.cmd:Popen(['git', 'rev-parse', '--show-toplevel'], cwd=C:\Users\spodw\Documents\dcu-rag, stdin=None, shell=False, universal_newlines=False)
+DEBUG:git.cmd:Popen(['git', 'remote', 'get-url', '--all', 'origin'], cwd=C:\Users\spodw\Documents\dcu-rag, stdin=None, shell=False, universal_newlines=False)
+DEBUG:urllib3.connectionpool:Starting new HTTP connection (1): localhost:11434
+DEBUG:chromadb.config:Starting component System
+DEBUG:chromadb.config:Starting component Posthog
+DEBUG:git.cmd:Popen(['git', 'version'], cwd=C:\Users\spodw\Documents\dcu-rag, stdin=None, shell=False, universal_newlines=False)
+DEBUG:git.cmd:Popen(['git', 'version'], cwd=C:\Users\spodw\Documents\dcu-rag, stdin=None, shell=False, universal_newlines=False)
+DEBUG:git.util:sys.platform='win32', git_executable='git'
+DEBUG:git.cmd:Popen(['git', 'version'], cwd=C:\Users\spodw\Documents\dcu-rag, stdin=None, shell=False, universal_newlines=False)
+DEBUG:git.cmd:Popen(['git', 'rev-parse', '--show-toplevel'], cwd=C:\Users\spodw\Documents\dcu-rag, stdin=None, shell=False, universal_newlines=False)
+DEBUG:git.cmd:Popen(['git', 'remote', 'get-url', '--all', 'github'], cwd=C:\Users\spodw\Documents\dcu-rag, stdin=None, shell=False, universal_newlines=False)
+DEBUG:git.cmd:Popen(['git', 'status', '--porcelain', '--untracked-files'], cwd=C:\Users\spodw\Documents\dcu-rag, stdin=None, shell=False, universal_newlines=False)
+DEBUG:git.cmd:Popen(['git', 'diff', '--abbrev=40', '--full-index', '-M', '--raw', '-z', '--no-color'], cwd=C:\Users\spodw\Documents\dcu-rag, stdin=None, shell=False, universal_newlines=False)
+DEBUG:git.cmd:Popen(['git', 'rev-list', 'github/master..master', '--'], cwd=C:\Users\spodw\Documents\dcu-rag, stdin=None, shell=False, universal_newlines=False)
