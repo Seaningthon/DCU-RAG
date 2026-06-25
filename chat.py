@@ -11,11 +11,10 @@ logging.basicConfig(filename='logs/warning.log',level=logging.WARNING)
 #make sure sever is running
 import requests
 try:
-  response = requests.get("http://localhost:11434", timeout=2)
+  model = OllamaLLM(model="llama3.2",base_url=st.secrets["ollama"])
 except requests.ConnectionError:
   st.title("The Ollama server is not currently running. Make sure to run it.")
 
-model = OllamaLLM(model="llama3.2")
 
 SYSTEM_PROMPT = """You are a helpful teaching assistant for a specific university course. You answer student questions using ONLY the provided context from course materials (PDFs, lecture notes) or from previous messages in this conversation. 
 

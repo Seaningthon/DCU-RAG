@@ -1,4 +1,4 @@
-Download Ollama(llama 3.2) and have it running while running the web server.
+Have a webserver running Ollama with llama3.2 installed. You need to link it in .streamlit/secrets.toml.
 
 To install the needed Python libraries simply run:
 ```pip install -r requirements.txt```
