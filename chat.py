@@ -97,10 +97,7 @@ if subject_list:
   resources = subject.get_resources()
   if resources:
     for r in resources:
-      try:
-        st.sidebar.markdown(f"- [{r['source']}]({r['link']})")
-      except Exception:
-        st.sidebar.markdown(f"- {r['source']} (no link)")
+      st.sidebar.page_link(r['link'], label = r['source'])
   else:
     st.sidebar.markdown("No resources uploaded yet.")
 
