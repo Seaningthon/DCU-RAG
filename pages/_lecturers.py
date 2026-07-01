@@ -111,7 +111,7 @@ if subject_list:
   if resources:
     for r in resources:
       try:
-        st.sidebar.markdown(f"- [{r['source']}]({r['link']})")
+        st.sidebar.link_button(label=r['source'], url=r['link'])
       except Exception:
         st.sidebar.markdown(f"- {r['source']} (no link)")
   else:
