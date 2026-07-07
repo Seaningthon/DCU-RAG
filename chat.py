@@ -102,9 +102,10 @@ if subject_list:
     st.sidebar.markdown("No resources uploaded yet.")
 
 
-
-st.write(f"Select a subject from the sidebar currently: {subject} and ask away\n")
-
+try:
+  st.write(f"Select a subject from the sidebar currently: {subject} and ask away\n")
+except:
+  st.write(f"There currently are no subject available. If you are a lecturer please head over to https://dcu-rag.streamlit.app/lecturers and add one.")
 #create the chatgpt like look
 if "messages" not in st.session_state:
     st.session_state.messages = []
